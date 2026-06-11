@@ -362,40 +362,38 @@ async function handleLogout() {
  */
 async function loadEntries() {
   try {
+    if (!currentUser) return; // Safety check
+
     const { data, error } = await supabaseClient
       .from('kinta_entries')
       .select('*')
-      .order('created_at', { ascending: false }); // Sorts newest first
+      .eq('user_id', currentUser.id) // 🔒 FIXED: Only fetch logs belonging to this user
+      .order('created_at', { ascending: false }); 
 
     if (error) throw error;
 
-    // If database is empty, seed it with defaults (Optional)
+    // If database is empty for this specific user, handle seeding or clear view
     if (!data || data.length === 0) {
-      console.log('No entries found in database. Seeding defaults...');
+      console.log('No entries found for this user.');
       await seedDefaultEntries();
       return;
     }
 
     entries = data;
-    
-    // CRITICAL: Call your UI rendering function here to show the data
-    if (typeof renderEntries === 'function') {
-      renderEntries();
-    }
+    renderTimeline();
   } catch (error) {
     console.error('Error loading entries from Supabase:', error.message);
   }
 }
 
-/**
- * Optional helper function to populate your database if it's completely empty,
- * mimicking your original localStorage fallback logic.
- */
 async function seedDefaultEntries() {
   if (typeof DEFAULT_ENTRIES !== 'undefined' && DEFAULT_ENTRIES.length > 0) {
     try {
-      // Strips out any hardcoded client-side IDs so Supabase can generate them automatically
-      const cleanDefaults = DEFAULT_ENTRIES.map(({ id, ...rest }) => rest);
+      // Strip old IDs and attach the current user's ID to the defaults
+      const cleanDefaults = DEFAULT_ENTRIES.map(({ id, ...rest }) => ({
+        ...rest,
+        user_id: currentUser.id
+      }));
       
       const { data, error } = await supabaseClient
         .from('kinta_entries')
@@ -405,12 +403,17 @@ async function seedDefaultEntries() {
       if (error) throw error;
       
       entries = data;
-      if (typeof renderEntries === 'function') renderEntries();
+      renderTimeline();
     } catch (e) {
       console.error('Failed to seed default entries:', e.message);
     }
+  } else {
+    // If no defaults exist, ensure we wipe out the previous account's items from memory
+    entries = [];
+    renderTimeline();
   }
 }
+
 
 // ═══════════════════════════════════
 // MUTATIONS (Replacing saveEntries)
