@@ -75,6 +75,10 @@
 
   /* Red Accent (Deepened for contrast) */
   --red: #C93534;
+
+    /* Orange Accent */
+  --orange: #D8863B;
+  --orange-dim: rgba(216, 134, 59, 0.12);
 }
 
 .darkmode {
@@ -98,6 +102,8 @@
   --blue: #4F8EF7;
   --blue-dim: rgba(79,142,247,0.12);
   --red: #E24B4A;
+    --orange: #EAA865;
+  --orange-dim: rgba(234, 168, 101, 0.12);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -696,7 +702,7 @@ body::before {
 
 /* TYPE COLORS */
 .type-competition { background: var(--purple-dim); color: #c8c0f0; }
-.type-project { background: rgba(216, 134, 59, 1); color: #C76E00; }
+.type-project { background: var(--orange-dim); color: var(--orange); }
 .type-award { background: var(--gold-dim); color: var(--gold); }
 .type-leadership { background: var(--blue-dim); color: #B5D4F4; }
 .type-academic { background: var(--coral-dim); color: #F5C4B3; }
@@ -704,7 +710,7 @@ body::before {
 .type-personal { background: rgba(127,119,221,0.1); color: #c8c0f0; }
 
 .dot-competition { background: var(--purple); }
-.dot-project { background: rgba(255, 165, 0, 1); }
+.dot-project { background: var(--orange); }
 .dot-award { background: var(--gold); }
 .dot-leadership { background: var(--blue); }
 .dot-academic { background: var(--coral); }
